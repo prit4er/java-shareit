@@ -2,10 +2,10 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exeptions.ItemNotFoundException;
-import ru.practicum.shareit.exeptions.UserAccessDeniedException;
-import ru.practicum.shareit.exeptions.UserNotFoundException;
+import ru.practicum.shareit.exeptions.AccessDeniedException;
+import ru.practicum.shareit.exeptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.Collections;
@@ -19,55 +19,53 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
-
     @Override
     public ItemDto addItem(Integer userId, ItemDto itemDto) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User not found");
-        }
-        if (itemDto.getAvailable() == null) {
-            throw new IllegalArgumentException("Available status must be provided");
-        }
-        if (itemDto.getName() == null || itemDto.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Name must be provided and cannot be empty");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Description must be provided and cannot be empty");
-        }
-        itemDto.setOwnerId(userId);
-        return itemRepository.save(itemDto);
+        validateUserExists(userId);
+        validateItemDto(itemDto);
+
+        Item item = ItemDtoMapper.toEntity(itemDto);
+        item.setOwnerId(userId);
+        return ItemDtoMapper.toDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto updateItem(Integer userId, ItemDto itemDto) {
-        Integer itemId = itemDto.getId();
-        ItemDto existingItem = itemRepository.findById(itemId)
-                                             .orElseThrow(() -> new ItemNotFoundException("Item not found"));
+        validateUserExists(userId);
+
+        Item existingItem = itemRepository.findById(itemDto.getId())
+                                          .orElseThrow(() -> new NotFoundException("Item not found"));
+
         if (!existingItem.getOwnerId().equals(userId)) {
-            //Вот здесь общий эксепшен AccessDeniedException не работает =(
-            throw new UserAccessDeniedException("User is not the owner");
+            throw new AccessDeniedException("User is not the owner");
         }
-        if (itemDto.getName() != null) {
+
+        if (itemDto.getName() != null && !itemDto.getName().trim().isEmpty()) {
             existingItem.setName(itemDto.getName());
         }
-        if (itemDto.getDescription() != null) {
+        if (itemDto.getDescription() != null && !itemDto.getDescription().trim().isEmpty()) {
             existingItem.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
             existingItem.setAvailable(itemDto.getAvailable());
         }
-        return itemRepository.save(existingItem);
+
+        return ItemDtoMapper.toDto(itemRepository.save(existingItem));
     }
 
     @Override
     public ItemDto getItem(Integer itemId) {
         return itemRepository.findById(itemId)
-                             .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+                             .map(ItemDtoMapper::toDto)
+                             .orElseThrow(() -> new NotFoundException("Item not found"));
     }
 
     @Override
     public List<ItemDto> getUserItems(Integer userId) {
-        return itemRepository.findByOwnerId(userId);
+        validateUserExists(userId);
+        return itemRepository.findByOwnerId(userId).stream()
+                             .map(ItemDtoMapper::toDto)
+                             .collect(Collectors.toList());
     }
 
     @Override
@@ -78,10 +76,32 @@ public class ItemServiceImpl implements ItemService {
 
         String lowerCaseText = text.toLowerCase();
         return itemRepository.findAll().stream()
-                             .filter(item -> Boolean.TRUE.equals(item.getAvailable()) &&
-                                     ((item.getName() != null && item.getName().toLowerCase().contains(lowerCaseText)) ||
-                                             (item.getDescription() != null && item.getDescription().toLowerCase().contains(
-                                                     lowerCaseText))))
+                             .filter(item -> Boolean.TRUE.equals(item.getAvailable()))
+                             .filter(item -> containsText(item, lowerCaseText))
+                             .map(ItemDtoMapper::toDto)
                              .collect(Collectors.toList());
+    }
+
+    private boolean containsText(Item item, String text) {
+        return (item.getName() != null && item.getName().toLowerCase().contains(text)) ||
+                (item.getDescription() != null && item.getDescription().toLowerCase().contains(text));
+    }
+
+    private void validateUserExists(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    private void validateItemDto(ItemDto itemDto) {
+        if (itemDto.getAvailable() == null) {
+            throw new IllegalArgumentException("Available status must be provided");
+        }
+        if (itemDto.getName() == null || itemDto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name must be provided and cannot be empty");
+        }
+        if (itemDto.getDescription() == null || itemDto.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("Description must be provided and cannot be empty");
+        }
     }
 }

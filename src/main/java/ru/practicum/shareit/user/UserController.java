@@ -28,35 +28,32 @@ public class UserController {
     @GetMapping
     public List<UserDto> getAllUsers() {
         List<User> users = userService.getAll();
-        return UserDtoMapper.toUserDtoList(users);
+        return UserDtoMapper.toDto(users);
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable Integer id) {
         User user = userService.get(id);
-        return UserDtoMapper.toUserDto(user);
+        return UserDtoMapper.toDto(user);
     }
 
     @PostMapping
     public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) {
-        User user = UserDtoMapper.toUser(userDto);
+        User user = UserDtoMapper.toEntity(userDto);
         User savedUser = userService.add(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserDtoMapper.toUserDto(savedUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserDtoMapper.toDto(savedUser));
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
-        User user = userService.get(id);
-        if (user != null) {
-            userService.delete(user);
-        }
+        userService.delete(id);
     }
 
     @PatchMapping("/{id}")
     public UserDto patchUser(@PathVariable Integer id, @RequestBody UserDto userDto) {
-        User userToUpdate = UserDtoMapper.toUser(userDto);
+        User userToUpdate = UserDtoMapper.toEntity(userDto);
         User updatedUser = userService.update(id, userToUpdate);
-        return updatedUser != null ? UserDtoMapper.toUserDto(updatedUser) : null;
+        return updatedUser != null ? UserDtoMapper.toDto(updatedUser) : null;
     }
 
 }

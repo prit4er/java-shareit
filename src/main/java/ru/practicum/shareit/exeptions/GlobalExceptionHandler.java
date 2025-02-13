@@ -41,35 +41,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(NotFoundException ex) {
         log.warn("Не найдено: {}", ex.getMessage());
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(ItemNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleItemNotFound(ItemNotFoundException ex) {
-        log.warn("ItemNotFoundException: {}", ex.getMessage(), ex);
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
-    //Не знаю почему этот эксепшен не принимает в ItemDto updateItem(Integer userId, ItemDto itemDto)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
         log.warn("AccessDeniedException: {}", ex.getMessage(), ex);
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
-    }
-
-    // Поэтому пришлось сделать еще один специально для ItemDto updateItem(Integer userId, ItemDto itemDto)
-    @ExceptionHandler(UserAccessDeniedException.class)
-    public ResponseEntity<Map<String, String>> handleUserAccessDenied(UserAccessDeniedException ex) {
-        log.warn("UserAccessDeniedException: {}", ex.getMessage(), ex);
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);

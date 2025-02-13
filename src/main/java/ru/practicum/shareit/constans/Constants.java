@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.constans;
+package ru.practicum.shareit.constans;
 
 public class Constants {
 

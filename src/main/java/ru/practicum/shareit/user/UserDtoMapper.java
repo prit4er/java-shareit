@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 
 public class UserDtoMapper {
 
-    public static UserDto toUserDto(User user) {
+    // Маппинг User -> UserDto
+    public static UserDto toDto(User user) {
         if (user == null) {
             return null;
         }
@@ -18,7 +19,8 @@ public class UserDtoMapper {
                       .build();
     }
 
-    public static User toUser(UserDto userDto) {
+    // Маппинг UserDto -> User
+    public static User toEntity(UserDto userDto) {
         if (userDto == null) {
             return null;
         }
@@ -29,9 +31,24 @@ public class UserDtoMapper {
                    .build();
     }
 
-    public static List<UserDto> toUserDtoList(List<User> users) {
+
+    // Маппинг коллекции User -> List<UserDto>
+    public static List<UserDto> toDto(List<User> users) {
+        if (users == null || users.isEmpty()) {
+            return List.of();
+        }
         return users.stream()
-                    .map(UserDtoMapper::toUserDto)
+                    .map(UserDtoMapper::toDto)
                     .collect(Collectors.toList());
+    }
+
+    // Маппинг коллекции UserDto -> List<User>
+    public static List<User> toEntity(List<UserDto> userDtos) {
+        if (userDtos == null || userDtos.isEmpty()) {
+            return List.of();
+        }
+        return userDtos.stream()
+                       .map(UserDtoMapper::toEntity)
+                       .collect(Collectors.toList());
     }
 }

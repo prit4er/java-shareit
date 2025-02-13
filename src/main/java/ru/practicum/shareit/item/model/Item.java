@@ -11,9 +11,9 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Item {
 
-    private final Integer id;
-    private final String name;
-    private final String description;
-    private final boolean available;
-    private final Integer ownerId;
+    private Integer id;
+    private String name;
+    private String description;
+    private Boolean available;
+    private Integer ownerId;
 }

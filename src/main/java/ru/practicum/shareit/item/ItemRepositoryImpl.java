@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final Map<Integer, ItemDto> items = new HashMap<>();
+    private final Map<Integer, Item> items = new HashMap<>();
     private Integer idCounter = 0;
 
     @Override
-    public ItemDto save(ItemDto item) {
+    public Item save(Item item) {
         if (item.getId() == null) {
             item.setId(++idCounter);
         }
@@ -26,12 +26,12 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Optional<ItemDto> findById(Integer id) {
+    public Optional<Item> findById(Integer id) {
         return Optional.ofNullable(items.get(id));
     }
 
     @Override
-    public List<ItemDto> findAll() {
+    public List<Item> findAll() {
         return new ArrayList<>(items.values());
     }
 
@@ -41,7 +41,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public List<ItemDto> findByOwnerId(Integer ownerId) {
+    public List<Item> findByOwnerId(Integer ownerId) {
         return items.values().stream()
                     .filter(item -> item.getOwnerId().equals(ownerId))
                     .collect(Collectors.toList());

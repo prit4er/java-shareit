@@ -6,7 +6,7 @@ public interface UserService {
 
     User add(User user);
 
-    User delete(User user);
+    void delete(Integer id);
 
     List<User> getAll();
 

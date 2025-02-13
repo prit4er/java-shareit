@@ -21,9 +21,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User delete(User user) {
-        userRepository.deleteById(user.getId());
-        return user;
+    public void delete(Integer id) {
+        User user = get(id); // Проверяем существование, выбрасываем NotFoundException при отсутствии
+        userRepository.deleteById(id); // Удаляем пользователя по ID
     }
 
     @Override
