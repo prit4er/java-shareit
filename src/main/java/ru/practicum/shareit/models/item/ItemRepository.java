@@ -9,29 +9,23 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Integer> {
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("""
-            SELECT i FROM Item i 
-            WHERE i.available = true 
-            AND (UPPER(i.name) LIKE UPPER(CONCAT('%', :text, '%')) 
-            OR UPPER(i.description) LIKE UPPER(CONCAT('%', :text, '%')))
-            """)
-    List<Item> search(@Param("text") String text);
+    @Query("select i from Item i " +
+            "where i.available = true " +
+            "and (upper(i.name) like upper(concat('%', ?1, '%'))" +
+            "or upper(i.description) like upper(concat('%', ?1, '%')))")
+    List<Item> search(String text);
 
-    @Query("""
-            SELECT i FROM Item i 
-            LEFT JOIN FETCH i.comments 
-            LEFT JOIN FETCH i.bookings b 
-            WHERE i.id = :id
-            """)
-    Optional<Item> findByIdInFull(@Param("id") Integer id);
+    @Query("SELECT i FROM Item i " +
+            "LEFT JOIN FETCH i.comments " +
+            "LEFT JOIN FETCH i.bookings b " +
+            "WHERE i.id = :id")
+    Optional<Item> findByIdInFull(@Param("id") Long id);
 
-    @Query("""
-            SELECT i FROM Item i 
-            LEFT JOIN FETCH i.comments 
-            LEFT JOIN FETCH i.bookings b 
-            WHERE i.owner.id = :ownerId
-            """)
-    List<Item> findAllByOwnerIdInFull(@Param("ownerId") Integer ownerId);
+    @Query("SELECT i FROM Item i " +
+            "LEFT JOIN FETCH i.comments " +
+            "LEFT JOIN FETCH i.bookings b " +
+            "WHERE i.owner.id = :ownerId")
+    List<Item> findAllByOwnerIdInFull(@Param("ownerId") Long ownerId);
 }
