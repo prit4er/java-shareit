@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends JpaRepository<Item, Integer> {
 
     @Query("select i from Item i " +
             "where i.available = true " +
@@ -21,11 +21,11 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "LEFT JOIN FETCH i.comments " +
             "LEFT JOIN FETCH i.bookings b " +
             "WHERE i.id = :id")
-    Optional<Item> findByIdInFull(@Param("id") Long id);
+    Optional<Item> findByIdInFull(@Param("id") Integer id);
 
     @Query("SELECT i FROM Item i " +
             "LEFT JOIN FETCH i.comments " +
             "LEFT JOIN FETCH i.bookings b " +
             "WHERE i.owner.id = :ownerId")
-    List<Item> findAllByOwnerIdInFull(@Param("ownerId") Long ownerId);
+    List<Item> findAllByOwnerIdInFull(@Param("ownerId") Integer ownerId);
 }
