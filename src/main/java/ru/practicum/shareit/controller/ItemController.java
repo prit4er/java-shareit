@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.models.comments.dto.CommentDto;
-import ru.practicum.shareit.models.item.ItemService;
-import ru.practicum.shareit.models.item.dto.ItemDto;
-import ru.practicum.shareit.models.item.request.ItemRequest;
+import ru.practicum.shareit.comments.dto.CommentDto;
+import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.request.ItemRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,13 +52,13 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemRequest read(@Positive @RequestHeader(HEADER_USER_ID) Integer userId,
-                            @Positive @PathVariable Integer itemId) {
+    public ItemRequest getBookingById(@Positive @RequestHeader(HEADER_USER_ID) Integer userId,
+                                      @Positive @PathVariable Integer itemId) {
         return itemService.findById(userId, itemId);
     }
 
     @GetMapping
-    public Collection<ItemRequest> readForTheUser(@Positive @RequestHeader(HEADER_USER_ID) Integer userId) {
+    public Collection<ItemRequest> getForTheUser(@Positive @RequestHeader(HEADER_USER_ID) Integer userId) {
         return itemService.findForTheUser(userId);
     }
 
