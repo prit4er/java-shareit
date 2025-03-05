@@ -2,7 +2,6 @@ package ru.practicum.shareit.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 
 import java.util.Collection;
 
 import static ru.practicum.shareit.constans.Constants.HEADER_USER_ID;
-import static ru.practicum.shareit.constans.Constants.STATE_REGEX;
 
 @Slf4j
 @RestController
@@ -50,19 +49,16 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<BookingResponseDto> getUserBookings(@Positive @RequestHeader(HEADER_USER_ID) Integer userId,
-                                                           @Valid @Pattern(regexp = STATE_REGEX)
-                                                           @RequestParam(required = false,
-                                                                   defaultValue = "ALL") String state) {
+    public Collection<BookingResponseDto> getUserBookings(
+            @Positive @RequestHeader(HEADER_USER_ID) Integer userId,
+            @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) {
         log.trace("Getting collection of bookings for user-owner with id: {} is started. State is: {}", userId, state);
         return bookingService.getUserBookings(userId, state);
     }
 
     @GetMapping("/owner")
     public Collection<BookingResponseDto> getUserAsOwnerBookings(@Positive @RequestHeader(HEADER_USER_ID) Integer userId,
-                                                                  @Valid @Pattern(regexp = STATE_REGEX)
-                                                                  @RequestParam(required = false,
-                                                                          defaultValue = "ALL") String state) {
+                                                                  @Valid @RequestParam(required = false, defaultValue = "ALL") BookingStatus state)  {
         log.trace("Getting collection of bookings for user-booker with id: {} is started. State is: {}",
                   userId, state);
         return bookingService.getOwnerBookings(userId, state);

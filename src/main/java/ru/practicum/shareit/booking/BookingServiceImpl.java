@@ -20,7 +20,6 @@ import java.util.Objects;
 
 import static ru.practicum.shareit.booking.BookingDtoMapper.toEntity;
 import static ru.practicum.shareit.booking.BookingDtoMapper.toResponseDto;
-import static ru.practicum.shareit.booking.BookingStatus.REJECTED;
 import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 import static ru.practicum.shareit.user.UserDtoMapper.toEntity;
 
@@ -82,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getOwnerBookings(Integer userId, String state) {
+    public List<BookingResponseDto> getOwnerBookings(Integer userId, BookingStatus state) {
         log.trace("Searching for owner bookings with id: {} has started (at service layer)", userId);
 
         userService.getById(userId);
@@ -92,11 +91,11 @@ public class BookingServiceImpl implements BookingService {
         log.trace("Current Date-Time set: {}", now);
 
         List<Booking> bookings = switch (state) {
-            case "CURRENT" -> bookingRepository.findBookingsByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
-            case "PAST" -> bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now);
-            case "FUTURE" -> bookingRepository.findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
-            case "WAITING" -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, WAITING);
-            case "REJECTED" -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, REJECTED);
+            case CURRENT -> bookingRepository.findBookingsByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+            case PAST -> bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now);
+            case FUTURE -> bookingRepository.findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
+            case WAITING -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+            case REJECTED -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
             default -> bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId);
         };
         log.debug("Owner booking status set");
@@ -105,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getUserBookings(Integer userId, String state) {
+    public List<BookingResponseDto> getUserBookings(Integer userId, BookingStatus state) {
         log.trace("Searching for user bookings with id: {} has started (at service layer)", userId);
 
         userService.getById(userId);
@@ -115,11 +114,11 @@ public class BookingServiceImpl implements BookingService {
         log.trace("Current Date-Time set: {}", now);
 
         List<Booking> bookings = switch (state) {
-            case "CURRENT" -> bookingRepository.findBookingsByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
-            case "PAST" -> bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
-            case "FUTURE" -> bookingRepository.findBookingsByBookerIdAndStartAfterOrderByStartDesc(userId, now);
-            case "WAITING" -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, WAITING);
-            case "REJECTED" -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, REJECTED);
+            case CURRENT -> bookingRepository.findBookingsByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+            case PAST -> bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
+            case FUTURE -> bookingRepository.findBookingsByBookerIdAndStartAfterOrderByStartDesc(userId, now);
+            case WAITING -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+            case REJECTED -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
             default -> bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId);
         };
         log.debug("User booking status set");
@@ -136,17 +135,26 @@ public class BookingServiceImpl implements BookingService {
                                                    String.format("There's no booking with id: %d in repository", bookingId)));
         log.debug("Booking with id: {} is in repository", bookingId);
 
+        // Проверка, что бронирование не было уже утверждено
         if (booking.getStatus().equals(BookingStatus.APPROVED) && approved) {
+            log.warn("Booking with id: {} is already approved. Cannot approve again.", bookingId);
             throw new BookingUpdateStatusException(
                     String.format("Unable to approve the booking. Booking with id: %d has already been approved", bookingId));
         }
 
+        // Проверка прав владельца
         validateOwnerAccess(userId, booking);
 
-        booking.setStatus(approved ? BookingStatus.APPROVED : REJECTED);
-        log.debug("Status set to {}", booking.getStatus());
+        // Установка нового статуса
+        BookingStatus newStatus = approved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
+        booking.setStatus(newStatus);
+        log.debug("Status updated to {}", newStatus);
 
-        return toResponseDto(bookingRepository.save(booking));
+        // Сохранение изменения и возврат DTO
+        Booking savedBooking = bookingRepository.save(booking);
+        log.debug("Booking status successfully updated and saved with id: {}", savedBooking.getId());
+
+        return toResponseDto(savedBooking);
     }
 
 

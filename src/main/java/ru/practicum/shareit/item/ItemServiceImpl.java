@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.booking.BookingStatus.ALL;
 import static ru.practicum.shareit.item.ItemDtoMapper.toEntityFromItemRequest;
 import static ru.practicum.shareit.item.ItemDtoMapper.toItemRequestFromEntity;
 
@@ -45,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(Integer userId, ItemDto itemDto) {
         log.trace("Adding item at service level has started");
 
-        User user = validateUserIsInRepository(userId);
+        User user = getUserById(userId);
         log.debug("Item owner exists. Start of adding owner to item");
 
         Item item = ItemDtoMapper.toEntity(itemDto, user);
@@ -60,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
         log.trace("Adding comment by user with id: {} for item with id: {} is started (at service layer)",
                   userId, itemId);
 
-        User author = validateUserIsInRepository(userId);
+        User author = getUserById(userId);
         log.debug("User-commentator exists");
 
         Item item = toEntityFromItemRequest(findById(userId, itemId));
@@ -110,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(Integer userId, Integer id, ItemDto itemDto) {
         log.trace("Update of item with id: {} has started (at service layer)", id);
 
-        validateUserIsInRepository(userId);
+        getUserById(userId);
         log.debug("Item owner (id: {}) exists", userId);
 
         Item oldItemForUpdate = itemRepository.findById(id)
@@ -151,14 +152,14 @@ public class ItemServiceImpl implements ItemService {
                              .collect(Collectors.toList());
     }
 
-    private User validateUserIsInRepository(Integer userId) {
+    private User getUserById(Integer userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                                                                    new NotFoundException(
                                                                            String.format("User with id: %d is not in repository", userId)));
     }
 
     private void validateTheAbilityToComment(Integer userId) {
-        bookingService.getUserBookings(userId, "ALL").stream()
+        bookingService.getUserBookings(userId, ALL).stream()
                       .filter(bookingResponse -> Objects.equals(bookingResponse.getBooker().getId(), userId) &&
                               bookingResponse.getEnd().isBefore(LocalDateTime.now()))
                       .findFirst().orElseThrow(() -> new UserNotValidToCommentException(
