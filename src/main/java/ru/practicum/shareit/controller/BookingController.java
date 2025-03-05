@@ -55,7 +55,7 @@ public class BookingController {
                                                            @RequestParam(required = false,
                                                                    defaultValue = "ALL") String state) {
         log.trace("Getting collection of bookings for user-owner with id: {} is started. State is: {}", userId, state);
-        return bookingService.getBookingsForUser(userId, state);
+        return bookingService.getUserBookings(userId, state);
     }
 
     @GetMapping("/owner")
@@ -65,7 +65,7 @@ public class BookingController {
                                                                           defaultValue = "ALL") String state) {
         log.trace("Getting collection of bookings for user-booker with id: {} is started. State is: {}",
                   userId, state);
-        return bookingService.getBookingsForOwner(userId, state);
+        return bookingService.getOwnerBookings(userId, state);
     }
 
     @PatchMapping("/{bookingId}")

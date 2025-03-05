@@ -158,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateTheAbilityToComment(Integer userId) {
-        bookingService.getBookingsForUser(userId, "ALL").stream()
+        bookingService.getUserBookings(userId, "ALL").stream()
                       .filter(bookingResponse -> Objects.equals(bookingResponse.getBooker().getId(), userId) &&
                               bookingResponse.getEnd().isBefore(LocalDateTime.now()))
                       .findFirst().orElseThrow(() -> new UserNotValidToCommentException(

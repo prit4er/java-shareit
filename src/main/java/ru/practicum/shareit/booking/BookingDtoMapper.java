@@ -36,7 +36,7 @@ public class BookingDtoMapper {
                       .build();
     }
 
-    public static BookingResponseDto toBookingResponse(Booking booking) {
+    public static BookingResponseDto toResponseDto(Booking booking) {
         log.debug("Mapping booking to response: {}", booking);
         return BookingResponseDto.builder()
                                  .id(booking.getId())

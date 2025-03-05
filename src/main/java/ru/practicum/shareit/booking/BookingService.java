@@ -14,9 +14,9 @@ public interface BookingService {
 
     BookingResponseDto findById(Integer userId, Integer bookingId);
 
-    Collection<BookingResponseDto> getBookingsForOwner(Integer userId, String state);
+    Collection<BookingResponseDto> getOwnerBookings(Integer userId, String state);
 
-    List<BookingResponseDto> getBookingsForUser(Integer userId, String state);
+    List<BookingResponseDto> getUserBookings(Integer userId, String state);
 
     BookingResponseDto updateStatus(Integer userId, Integer bookingId, Boolean approved);
 }

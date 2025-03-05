@@ -15,12 +15,13 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static ru.practicum.shareit.booking.BookingDtoMapper.toBookingResponse;
 import static ru.practicum.shareit.booking.BookingDtoMapper.toEntity;
+import static ru.practicum.shareit.booking.BookingDtoMapper.toResponseDto;
+import static ru.practicum.shareit.booking.BookingStatus.REJECTED;
+import static ru.practicum.shareit.booking.BookingStatus.WAITING;
 import static ru.practicum.shareit.user.UserDtoMapper.toEntity;
 
 
@@ -50,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = toEntity(bookingDto);
         booking.setBooker(user);
         booking.setItem(item);
-        booking.setStatus(BookingStatus.WAITING);
+        booking.setStatus(WAITING);
         log.debug("The booking entity has been created");
 
         // Логирование данных перед сохранением
@@ -59,7 +60,7 @@ public class BookingServiceImpl implements BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         log.debug("Booking saved with id: {}", savedBooking.getId());
 
-        return toBookingResponse(savedBooking);
+        return toResponseDto(savedBooking);
     }
 
     @Override
@@ -77,17 +78,53 @@ public class BookingServiceImpl implements BookingService {
         validateAccess(userId, booking);
         log.debug("The search of the booking with id {} by user with id {} was succeeded", bookingId, userId);
 
-        return toBookingResponse(booking);
+        return toResponseDto(booking);
     }
 
     @Override
-    public Collection<BookingResponseDto> getBookingsForOwner(Integer userId, String state) {
-        return getBookings(userId, state, true);
+    public List<BookingResponseDto> getOwnerBookings(Integer userId, String state) {
+        log.trace("Searching for owner bookings with id: {} has started (at service layer)", userId);
+
+        userService.getById(userId);
+        log.debug("User with id: {} is in repository", userId);
+
+        LocalDateTime now = LocalDateTime.now();
+        log.trace("Current Date-Time set: {}", now);
+
+        List<Booking> bookings = switch (state) {
+            case "CURRENT" -> bookingRepository.findBookingsByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+            case "PAST" -> bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now);
+            case "FUTURE" -> bookingRepository.findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
+            case "WAITING" -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, WAITING);
+            case "REJECTED" -> bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, REJECTED);
+            default -> bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId);
+        };
+        log.debug("Owner booking status set");
+
+        return bookings.stream().map(BookingDtoMapper::toResponseDto).toList();
     }
 
     @Override
-    public List<BookingResponseDto> getBookingsForUser(Integer userId, String state) {
-        return getBookings(userId, state, false);
+    public List<BookingResponseDto> getUserBookings(Integer userId, String state) {
+        log.trace("Searching for user bookings with id: {} has started (at service layer)", userId);
+
+        userService.getById(userId);
+        log.debug("User with id: {} is in repository", userId);
+
+        LocalDateTime now = LocalDateTime.now();
+        log.trace("Current Date-Time set: {}", now);
+
+        List<Booking> bookings = switch (state) {
+            case "CURRENT" -> bookingRepository.findBookingsByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
+            case "PAST" -> bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
+            case "FUTURE" -> bookingRepository.findBookingsByBookerIdAndStartAfterOrderByStartDesc(userId, now);
+            case "WAITING" -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, WAITING);
+            case "REJECTED" -> bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, REJECTED);
+            default -> bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId);
+        };
+        log.debug("User booking status set");
+
+        return bookings.stream().map(BookingDtoMapper::toResponseDto).toList();
     }
 
     @Override
@@ -106,10 +143,10 @@ public class BookingServiceImpl implements BookingService {
 
         validateOwnerAccess(userId, booking);
 
-        booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
+        booking.setStatus(approved ? BookingStatus.APPROVED : REJECTED);
         log.debug("Status set to {}", booking.getStatus());
 
-        return toBookingResponse(bookingRepository.save(booking));
+        return toResponseDto(bookingRepository.save(booking));
     }
 
 
@@ -133,39 +170,5 @@ public class BookingServiceImpl implements BookingService {
                     String.format("Status update denied. User with id: %d isn't an owner of item with id: %d",
                                   userId, booking.getItem().getId()));
         }
-    }
-
-    private List<BookingResponseDto> getBookings(Integer userId, String state, boolean isOwner) {
-        log.trace("Searching for bookings (owner: {}) with id: {} has started (at service layer)", isOwner, userId);
-
-        userService.getById(userId);
-        log.debug("User with id: {} is in repository", userId);
-
-        LocalDateTime now = LocalDateTime.now();
-        log.trace("Current Date-Time set: {}", now);
-
-        List<Booking> bookings = switch (state) {
-            case "CURRENT" -> isOwner
-                              ? bookingRepository.findBookingsByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now)
-                              : bookingRepository.findBookingsByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
-            case "PAST" -> isOwner
-                           ? bookingRepository.findBookingsByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now)
-                           : bookingRepository.findBookingsByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
-            case "FUTURE" -> isOwner
-                             ? bookingRepository.findBookingsByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now)
-                             : bookingRepository.findBookingsByBookerIdAndStartAfterOrderByStartDesc(userId, now);
-            case "WAITING" -> isOwner
-                              ? bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING)
-                              : bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
-            case "REJECTED" -> isOwner
-                               ? bookingRepository.findBookingsByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED)
-                               : bookingRepository.findBookingsByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
-            default -> isOwner
-                       ? bookingRepository.findBookingsByItemOwnerIdOrderByStartDesc(userId)
-                       : bookingRepository.findBookingsByBookerIdOrderByStartDesc(userId);
-        };
-        log.debug("Booking status set");
-
-        return bookings.stream().map(BookingDtoMapper::toBookingResponse).toList();
     }
 }
