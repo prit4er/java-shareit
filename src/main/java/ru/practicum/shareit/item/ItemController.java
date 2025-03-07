@@ -1,4 +1,4 @@
-package ru.practicum.shareit.controller;
+package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -17,14 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.comments.dto.CommentDto;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.request.ItemRequest;
 
 import java.util.Collection;
 import java.util.List;
 
-import static ru.practicum.shareit.constans.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.constants.Constants.HEADER_USER_ID;
 
 @RestController
 @RequestMapping("/items")
