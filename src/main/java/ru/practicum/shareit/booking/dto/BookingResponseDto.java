@@ -1,14 +1,14 @@
 package ru.practicum.shareit.booking.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -17,22 +17,17 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class BookingDto {
+public class BookingResponseDto {
 
     private Integer id;
 
-    @NotNull
-    @FutureOrPresent
     private LocalDateTime start;
 
-    @NotNull
-    @Future
     private LocalDateTime end;
 
-    @NotNull
-    private Integer itemId;
+    private ItemDto item;
 
-    private Integer bookerId;
+    private UserDto booker;
 
     private BookingStatus status;
 }

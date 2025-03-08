@@ -2,61 +2,65 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exeptions.ConflictException;
+import ru.practicum.shareit.exeptions.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     @Override
-    public User add(User user) {
+    public UserDto add(UserDto userDto) {
+        User user = UserDtoMapper.toEntity(userDto);
         if (isEmailTaken(user.getEmail())) {
             throw new ConflictException("Email is already taken");
         }
-        return userRepository.save(user);
+        return UserDtoMapper.toDto(userRepository.save(user));
     }
 
     @Override
     public void delete(Integer id) {
-        User user = get(id); // Проверяем существование, выбрасываем NotFoundException при отсутствии
-        userRepository.deleteById(id); // Удаляем пользователя по ID
+        User user = userRepository.findById(id)
+                                  .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
+        userRepository.delete(user);
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<UserDto> getAll() {
+        List<User> users = userRepository.findAll();
+        return UserDtoMapper.toDto(users);
     }
 
     @Override
-    public User get(Integer id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return user;
+    public UserDto getById(Integer id) {
+        User user = userRepository.findById(id)
+                                  .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
+        return UserDtoMapper.toDto(user);
     }
 
     @Override
-    public User update(Integer id, User updatedUser) {
-        User existingUser = userRepository.findById(id);
-        if (existingUser == null) {
-            throw new IllegalArgumentException("User not found");
-        }
+    public UserDto update(Integer id, UserDto updatedUserDto) {
+        User existingUser = userRepository.findById(id)
+                                          .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
 
-        if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(existingUser.getEmail())) {
-            if (isEmailTaken(updatedUser.getEmail())) {
+        if (updatedUserDto.getEmail() != null && !updatedUserDto.getEmail().equals(existingUser.getEmail())) {
+            if (isEmailTaken(updatedUserDto.getEmail())) {
                 throw new ConflictException("Email is already taken");
             }
-            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setEmail(updatedUserDto.getEmail());
         }
-        if (updatedUser.getName() != null) {
-            existingUser.setName(updatedUser.getName());
+        if (updatedUserDto.getName() != null) {
+            existingUser.setName(updatedUserDto.getName());
         }
-        return userRepository.save(existingUser);
+
+        return UserDtoMapper.toDto(userRepository.save(existingUser));
     }
 
     private boolean isEmailTaken(String email) {
