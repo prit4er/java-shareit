@@ -10,51 +10,50 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemDtoMapper {
 
     public static ItemDto toDto(Item item) {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(item.getItemId());
-        itemDto.setName(item.getName());
-        itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.isAvailable());
-        itemDto.setOwner(item.getOwnerId());
-        itemDto.setRequestId(item.getRequest() != null ? item.getRequest().getRequestId() : null);
-        itemDto.setComments(item.getComments() != null ?
-                            item.getComments().stream()
-                                .map(CommentDtoMapper::convertToDto)
-                                .toList() : Collections.emptyList());
-        return itemDto;
+        if (item == null) {
+            throw new IllegalArgumentException("Item cannot be null");
+        }
+        return ItemDto.builder()
+                      .id(item.getItemId())
+                      .name(item.getName())
+                      .description(item.getDescription())
+                      .available(item.isAvailable())
+                      .owner(item.getOwnerId())
+                      .requestId(item.getRequest() != null ? item.getRequest().getRequestId() : null)
+                      .comments(item.getComments() != null
+                                ? item.getComments().stream().map(CommentDtoMapper::toDto).toList()
+                                : Collections.emptyList())
+                      .build();
     }
 
     public static Item toEntity(ItemDto itemDto, User owner, ItemRequest request) {
-        Item item = new Item();
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setOwnerId(owner.getUserId());
-        item.setRequest(request);
-        item.setComments(itemDto.getComments() != null ?
-                         itemDto.getComments().stream()
-                                .map(commentDto -> CommentDtoMapper.convertToEntity(commentDto, item, owner))
-                                .toList() : new ArrayList<>());
-        return item;
+        if (itemDto == null) {
+            throw new IllegalArgumentException("Item cannot be null");
+        }
+        return Item.builder()
+                   .name(itemDto.getName())
+                   .description(itemDto.getDescription())
+                   .isAvailable(itemDto.getAvailable())
+                   .ownerId(owner.getUserId())
+                   .request(request)
+                   .comments(itemDto.getComments() != null
+                             ? itemDto.getComments().stream()
+                                      .map(commentDto -> CommentDtoMapper.toEntity(commentDto, null, owner))
+                                      .toList()
+                             : new ArrayList<>())
+                   .build();
     }
 
     public static void updateItemFields(Item item, MainItemRequestDto itemUpdateDto) {
-        if (itemUpdateDto.getName() != null) {
-            item.setName(itemUpdateDto.getName());
-        }
-        if (itemUpdateDto.getDescription() != null) {
-            item.setDescription(itemUpdateDto.getDescription());
-        }
-        if (itemUpdateDto.getAvailable() != null) {
-            item.setAvailable(itemUpdateDto.getAvailable());
-        }
-        if (itemUpdateDto.getRequest() != null) {
-            item.setRequest(itemUpdateDto.getRequest());
-        }
+        Optional.ofNullable(itemUpdateDto.getName()).ifPresent(item::setName);
+        Optional.ofNullable(itemUpdateDto.getDescription()).ifPresent(item::setDescription);
+        Optional.ofNullable(itemUpdateDto.getAvailable()).ifPresent(item::setAvailable);
+        Optional.ofNullable(itemUpdateDto.getRequest()).ifPresent(item::setRequest);
     }
 }

@@ -14,8 +14,10 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.comments.Comment;
@@ -24,10 +26,12 @@ import ru.practicum.shareit.request.ItemRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
 @Table(name = "items")
 public class Item {
 

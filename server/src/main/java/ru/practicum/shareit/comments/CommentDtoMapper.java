@@ -11,22 +11,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentDtoMapper {
 
-    public static CommentDto convertToDto(Comment comment) {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setText(comment.getText());
-        commentDto.setAuthorName(comment.getAuthor().getName());
-        commentDto.setCreated(comment.getCreated());
-        return commentDto;
+    public static CommentDto toDto(Comment comment) {
+        return new CommentDto(
+                comment.getId(),
+                comment.getText(),
+                comment.getAuthor().getName(),
+                comment.getCreated()
+        );
     }
 
-    public static Comment convertToEntity(CommentDto commentDto, Item item, User author) {
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setText(commentDto.getText());
-        comment.setItem(item);
-        comment.setAuthor(author);
-        comment.setCreated(commentDto.getCreated() != null ? commentDto.getCreated() : LocalDateTime.now());
-        return comment;
+    public static Comment toEntity(CommentDto commentDto, Item item, User author) {
+        if (commentDto == null || item == null || author == null) {
+            throw new IllegalArgumentException("CommentDto, Item, and User must not be null");
+        }
+        return new Comment(
+                commentDto.getId(),
+                commentDto.getText(),
+                item,
+                author,
+                commentDto.getCreated() != null ? commentDto.getCreated() : LocalDateTime.now()
+        );
     }
 }

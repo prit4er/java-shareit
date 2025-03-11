@@ -56,11 +56,11 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Invalid booking dates");
         }
 
-        Booking booking = BookingDtoMapper.convertToEntity(bookingDto, item, booker);
+        Booking booking = BookingDtoMapper.toEntity(bookingDto, item, booker);
         booking.setStatus(BookingStatus.WAITING);
         Booking savedBooking = bookingRepository.save(booking);
 
-        return BookingDtoMapper.convertToDto(savedBooking);
+        return BookingDtoMapper.toDto(savedBooking);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
         Booking updatedBooking = bookingRepository.save(booking);
 
-        return BookingDtoMapper.convertToDto(updatedBooking);
+        return BookingDtoMapper.toDto(updatedBooking);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Only the booker or owner can view the booking");
         }
 
-        return BookingDtoMapper.convertToDto(booking);
+        return BookingDtoMapper.toDto(booking);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return bookingRepository.findByItem_OwnerId(ownerId).stream()
-                                .map(BookingDtoMapper::convertToDto)
+                                .map(BookingDtoMapper::toDto)
                                 .toList();
     }
 
@@ -117,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
 
         return bookings.stream()
                        .sorted(Comparator.comparing(Booking::getStartTime).reversed())
-                       .map(BookingDtoMapper::convertToDto)
+                       .map(BookingDtoMapper::toDto)
                        .toList();
     }
 

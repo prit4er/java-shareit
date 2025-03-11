@@ -28,7 +28,7 @@ class CommentMapperTest {
         comment.setItem(item);
         comment.setCreated(LocalDateTime.now());
 
-        CommentDto result = CommentDtoMapper.convertToDto(comment);
+        CommentDto result = CommentDtoMapper.toDto(comment);
 
         assertEquals(1L, result.getId());
         assertEquals("Great item!", result.getText());
@@ -46,7 +46,7 @@ class CommentMapperTest {
         commentDto.setId(1L);
         commentDto.setText("Great item!");
 
-        Comment result = CommentDtoMapper.convertToEntity(commentDto, item, author);
+        Comment result = CommentDtoMapper.toEntity(commentDto, item, author);
 
         assertEquals(1L, result.getId());
         assertEquals("Great item!", result.getText());

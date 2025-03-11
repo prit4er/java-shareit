@@ -248,9 +248,9 @@ class ItemServiceImplTest {
 
             when(commentRepository.findByItem_ItemId(itemId))
                     .thenReturn(new ArrayList<>(Collections.singletonList(comment)));
-            commentMapper.when(() -> CommentDtoMapper.convertToEntity(inputComment, item, user)).thenReturn(comment);
+            commentMapper.when(() -> CommentDtoMapper.toEntity(inputComment, item, user)).thenReturn(comment);
             when(commentRepository.save(comment)).thenReturn(comment);
-            commentMapper.when(() -> CommentDtoMapper.convertToDto(comment)).thenReturn(commentDto);
+            commentMapper.when(() -> CommentDtoMapper.toDto(comment)).thenReturn(commentDto);
 
             CommentDto result = itemService.addComment(itemId, userId, inputComment);
 

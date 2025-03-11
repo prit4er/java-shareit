@@ -161,7 +161,7 @@ public class ItemServiceImpl implements ItemService {
                     "Cannot comment until booking is completed for userId=%s, itemId=%s", userId, itemId));
         }
 
-        Comment comment = CommentDtoMapper.convertToEntity(commentDto, item, author);
+        Comment comment = CommentDtoMapper.toEntity(commentDto, item, author);
 
         Collection<Comment> comments = commentRepository.findByItem_ItemId(itemId);
         if (comments == null || comments.isEmpty()) {
@@ -174,7 +174,7 @@ public class ItemServiceImpl implements ItemService {
         Comment savedComment = commentRepository.save(comment);
         log.info("Comment added successfully: id = {}", savedComment.getId());
 
-        return CommentDtoMapper.convertToDto(savedComment);
+        return CommentDtoMapper.toDto(savedComment);
     }
 
     public void updateBookingsForItem(Long itemId) {

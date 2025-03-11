@@ -11,25 +11,29 @@ import ru.practicum.shareit.user.UserDtoMapper;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingDtoMapper {
 
-    public static BookingDto convertToDto(Booking booking) {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setId(booking.getId());
-        bookingDto.setStartTime(booking.getStartTime());
-        bookingDto.setEndTime(booking.getEndTime());
-        bookingDto.setStatus(booking.getStatus());
-        bookingDto.setBooker(UserDtoMapper.toDto(booking.getBooker()));
-        bookingDto.setItem(ItemDtoMapper.toDto(booking.getItem()));
-        return bookingDto;
+    public static BookingDto toDto(Booking booking) {
+        return new BookingDto(
+                booking.getId(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                null, // itemId отсутствует в Booking
+                booking.getStatus(),
+                UserDtoMapper.toDto(booking.getBooker()),
+                ItemDtoMapper.toDto(booking.getItem())
+        );
     }
 
-    public static Booking convertToEntity(BookingDto bookingDto, Item item, User booker) {
-        Booking booking = new Booking();
-        booking.setId(bookingDto.getId());
-        booking.setStartTime(bookingDto.getStartTime());
-        booking.setEndTime(bookingDto.getEndTime());
-        booking.setItem(item);
-        booking.setBooker(booker);
-        booking.setStatus(bookingDto.getStatus());
-        return booking;
+    public static Booking toEntity(BookingDto bookingDto, Item item, User booker) {
+        if (bookingDto == null || item == null || booker == null) {
+            throw new IllegalArgumentException("BookingDto, Item, and User must not be null");
+        }
+        return new Booking(
+                bookingDto.getId(),
+                bookingDto.getStartTime(),
+                bookingDto.getEndTime(),
+                item,
+                booker,
+                bookingDto.getStatus()
+        );
     }
 }

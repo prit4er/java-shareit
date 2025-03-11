@@ -8,22 +8,31 @@ import ru.practicum.shareit.user.dto.UserDto;
 public final class UserDtoMapper {
 
     public static UserDto toDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getUserId());
-        userDto.setName(user.getName());
-        userDto.setEmail(user.getEmail());
-        return userDto;
+        if (user == null) {
+            return null;
+        }
+        return UserDto.builder()
+                      .id(user.getUserId())
+                      .name(user.getName())
+                      .email(user.getEmail())
+                      .build();
     }
 
     public static User toEntity(UserDto userDto) {
-        User user = new User();
-        user.setUserId(userDto.getId());
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        return user;
+        if (userDto == null) {
+            return null;
+        }
+        return User.builder()
+                   .userId(userDto.getId())
+                   .name(userDto.getName())
+                   .email(userDto.getEmail())
+                   .build();
     }
 
     public static void updateUserFields(User user, UserDto userDto) {
+        if (user == null || userDto == null) {
+            return;
+        }
         if (userDto.getName() != null) {
             user.setName(userDto.getName());
         }

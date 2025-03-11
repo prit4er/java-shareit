@@ -9,38 +9,42 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemRequestMapper {
+
     public static ItemRequestDto toDto(ItemRequest request) {
-        ItemRequestDto requestDto = new ItemRequestDto();
-        requestDto.setId(request.getRequestId());
-        requestDto.setDescription(request.getDescription());
-        requestDto.setCreated(request.getCreated());
-        requestDto.setItems(request.getItems() != null ?
-                            request.getItems().stream()
-                                   .map(ItemDtoMapper::toDto)
-                                   .toList() : Collections.emptyList());
-        return requestDto;
+        if (request == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+        return ItemRequestDto.builder()
+                             .id(request.getRequestId())
+                             .description(request.getDescription())
+                             .created(request.getCreated())
+                             .items(request.getItems() != null
+                                    ? request.getItems().stream().map(ItemDtoMapper::toDto).toList()
+                                    : Collections.emptyList())
+                             .build();
     }
 
     public static ItemRequest toEntity(ItemRequestDto requestDto, User owner) {
-        ItemRequest request = new ItemRequest();
-        request.setDescription(requestDto.getDescription());
-        request.setCreated(requestDto.getCreated() != null ? requestDto.getCreated() : LocalDateTime.now());
-        request.setItems(requestDto.getItems() != null ?
-                         requestDto.getItems().stream()
-                                   .map(itemDto -> ItemDtoMapper.toEntity(itemDto, owner, request))
-                                   .toList() : new ArrayList<>());
-        return request;
+        if (requestDto == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+        return ItemRequest.builder()
+                          .description(requestDto.getDescription())
+                          .created(requestDto.getCreated() != null ? requestDto.getCreated() : LocalDateTime.now())
+                          .items(requestDto.getItems() != null
+                                 ? requestDto.getItems().stream()
+                                             .map(itemDto -> ItemDtoMapper.toEntity(itemDto, owner, null))
+                                             .toList()
+                                 : new ArrayList<>())
+                          .build();
     }
 
     public static void updateRequestFields(ItemRequest request, ItemRequestDto requestDto) {
-        if (requestDto.getDescription() != null) {
-            request.setDescription(requestDto.getDescription());
-        }
-        if (requestDto.getCreated() != null) {
-            request.setCreated(requestDto.getCreated());
-        }
+        Optional.ofNullable(requestDto.getDescription()).ifPresent(request::setDescription);
+        Optional.ofNullable(requestDto.getCreated()).ifPresent(request::setCreated);
     }
 }

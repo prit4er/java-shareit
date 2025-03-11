@@ -99,7 +99,7 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(userRepository.existsById(2L)).thenReturn(true);
             when(bookingRepository.findByItem_OwnerId(2L)).thenReturn(Collections.singletonList(booking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByOwnerId(2L);
 
@@ -119,9 +119,9 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(userRepository.findById(1L)).thenReturn(Optional.of(booker));
             when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-            mapper.when(() -> BookingDtoMapper.convertToEntity(bookingDto, item, booker)).thenReturn(booking);
+            mapper.when(() -> BookingDtoMapper.toEntity(bookingDto, item, booker)).thenReturn(booking);
             when(bookingRepository.save(booking)).thenReturn(booking);
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             BookingDto result = bookingService.createBooking(bookingDto, 1L);
 
@@ -177,7 +177,7 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
             when(bookingRepository.save(booking)).thenReturn(booking);
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             BookingDto result = bookingService.approveBooking(1L, 2L, true);
 
@@ -191,7 +191,7 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
             when(bookingRepository.save(booking)).thenReturn(booking);
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             BookingDto result = bookingService.approveBooking(1L, 2L, false);
 
@@ -228,7 +228,7 @@ class BookingServiceImplTest {
             localDateTime.when(LocalDateTime::now).thenReturn(fixedTime);
             when(bookingRepository.findCurrentBookingsByBookerId(1L, fixedTime))
                     .thenReturn(Collections.singletonList(currentBooking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.CURRENT);
 
@@ -252,7 +252,7 @@ class BookingServiceImplTest {
             localDateTime.when(LocalDateTime::now).thenReturn(fixedTime);
             when(bookingRepository.findPastBookingsByBookerId(1L, fixedTime))
                     .thenReturn(Collections.singletonList(pastBooking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.PAST);
 
@@ -276,7 +276,7 @@ class BookingServiceImplTest {
             localDateTime.when(LocalDateTime::now).thenReturn(fixedTime);
             when(bookingRepository.findFutureBookingsByBookerId(1L, fixedTime))
                     .thenReturn(Collections.singletonList(futureBooking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.FUTURE);
 
@@ -290,7 +290,7 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findByBooker_UserIdAndStatus(1L, BookingStatus.WAITING))
                     .thenReturn(Collections.singletonList(booking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.WAITING);
 
@@ -310,7 +310,7 @@ class BookingServiceImplTest {
 
             when(bookingRepository.findByBooker_UserIdAndStatus(1L, BookingStatus.REJECTED))
                     .thenReturn(Collections.singletonList(rejectedBooking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.REJECTED);
 
@@ -324,7 +324,7 @@ class BookingServiceImplTest {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findByBooker_UserId(1L))
                     .thenReturn(Collections.singletonList(booking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(any(Booking.class))).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(any(Booking.class))).thenReturn(bookingDto);
 
             Collection<BookingDto> result = bookingService.getBookingsByBookerIdAndState(1L, BookingStatus.ALL);
 
@@ -337,7 +337,7 @@ class BookingServiceImplTest {
     void getBookingForBooker() {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             BookingDto result = bookingService.getBookingById(1L, 1L); // Booker ID
 
@@ -350,7 +350,7 @@ class BookingServiceImplTest {
     void getBookingForOwner() {
         try (MockedStatic<BookingDtoMapper> mapper = mockStatic(BookingDtoMapper.class)) {
             when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-            mapper.when(() -> BookingDtoMapper.convertToDto(booking)).thenReturn(bookingDto);
+            mapper.when(() -> BookingDtoMapper.toDto(booking)).thenReturn(bookingDto);
 
             BookingDto result = bookingService.getBookingById(1L, 2L);
 
