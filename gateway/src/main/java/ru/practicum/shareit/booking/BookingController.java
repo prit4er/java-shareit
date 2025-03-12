@@ -33,8 +33,8 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader(USER_HEADER) @Positive long userId,
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") long from,
+                                              @Positive @RequestParam(name = "size", defaultValue = "10") long size) {
         BookingState state = BookingState.from(stateParam)
                                          .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Sending GET request for bookings with state {}, userId={}, from={}, size={}",
@@ -44,7 +44,7 @@ public class BookingController {
 
     @GetMapping("/{booking-id}")
     public ResponseEntity<Object> getBooking(@RequestHeader(USER_HEADER) @Positive long userId,
-                                             @PathVariable("booking-id") @Positive Long bookingId) {
+                                             @PathVariable("booking-id") @Positive long bookingId) {
         log.info("Sending GET request for booking {}, userId={}", bookingId, userId);
         return bookingClient.getBooking(userId, bookingId);
     }
@@ -58,7 +58,7 @@ public class BookingController {
 
     @PatchMapping("/{booking-id}")
     public ResponseEntity<Object> approveBooking(@RequestHeader(USER_HEADER) @Positive long ownerId,
-                                                 @PathVariable("booking-id") @Positive Long bookingId,
+                                                 @PathVariable("booking-id") @Positive long bookingId,
                                                  @RequestParam @NotNull boolean approved) {
         log.info("Sending PATCH request for booking with id: {} by user with id: {}", bookingId, ownerId);
         return bookingClient.approveBooking(bookingId, ownerId, approved);

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.MainItemRequestDto;
 
 
 @Controller
@@ -54,7 +54,7 @@ public class ItemController {
 
     @PatchMapping("/{item-id}")
     public ResponseEntity<Object> updateItem(@RequestHeader(USER_HEADER) @Positive long userId,
-                                             @PathVariable("item-id") @Positive long itemId, @RequestBody @Valid ItemUpdateDto itemDto) {
+                                             @PathVariable("item-id") @Positive long itemId, @RequestBody @Valid MainItemRequestDto itemDto) {
         log.info("Sending PATCH request for item with id: {} for user with id: {}", itemId, userId);
         return itemClient.updateItem(itemId, userId, itemDto);
     }

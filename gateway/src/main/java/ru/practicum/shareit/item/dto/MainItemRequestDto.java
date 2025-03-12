@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemUpdateDto {
+public class MainItemRequestDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     Long id;
     @NotBlank(message = "Name is required")
