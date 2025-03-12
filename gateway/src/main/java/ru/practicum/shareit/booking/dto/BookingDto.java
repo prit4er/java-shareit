@@ -23,9 +23,11 @@ public class BookingDto {
     Long id;
 
     @NotNull(message = "Start time cannot be null")
+    @JsonProperty("start")
     LocalDateTime startTime;
 
     @NotNull(message = "End time cannot be null")
+    @JsonProperty("end")
     LocalDateTime endTime;
 
     @NotNull(message = "Item ID cannot be null")
