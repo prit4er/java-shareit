@@ -29,8 +29,8 @@ public class BookingDtoMapper {
         }
         return new Booking(
                 bookingDto.getId(),
-                bookingDto.getStartTime(),
-                bookingDto.getEndTime(),
+                bookingDto.getStart(),
+                bookingDto.getEnd(),
                 item,
                 booker,
                 bookingDto.getStatus()

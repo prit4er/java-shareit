@@ -27,9 +27,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto createBooking(BookingDto bookingDto, Long bookerId) {
-        log.info("StartTime: {}, EndTime: {}", bookingDto.getStartTime(), bookingDto.getEndTime());
+        log.info("StartTime: {}, EndTime: {}", bookingDto.getStart(), bookingDto.getEnd());
 
-        if (bookingDto.getStartTime() == null || bookingDto.getEndTime() == null) {
+        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
             throw new ValidationException("Booking dates cannot be null");
         }
 
@@ -51,8 +51,8 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Owner cannot book their own item");
         }
 
-        if (bookingDto.getStartTime().isAfter(bookingDto.getEndTime()) ||
-                bookingDto.getStartTime().isEqual(bookingDto.getEndTime())) {
+        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) ||
+                bookingDto.getStart().isEqual(bookingDto.getEnd())) {
             throw new ValidationException("Invalid booking dates");
         }
 

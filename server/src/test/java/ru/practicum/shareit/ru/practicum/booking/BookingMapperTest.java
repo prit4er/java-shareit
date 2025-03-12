@@ -40,8 +40,8 @@ class BookingMapperTest {
 
         // Assert
         assertEquals(BOOKING_ID, result.getId());
-        assertEquals(START_TIME, result.getStartTime());
-        assertEquals(END_TIME, result.getEndTime());
+        assertEquals(START_TIME, result.getStart());
+        assertEquals(END_TIME, result.getEnd());
         assertEquals(BookingStatus.APPROVED, result.getStatus());
         assertEquals(USER_ID, result.getBooker().getId());
         assertEquals(ITEM_ID, result.getItem().getId());
@@ -56,8 +56,8 @@ class BookingMapperTest {
         item.setItemId(ITEM_ID);
         BookingDto dto = new BookingDto();
         dto.setId(BOOKING_ID);
-        dto.setStartTime(START_TIME);
-        dto.setEndTime(END_TIME);
+        dto.setStart(START_TIME);
+        dto.setEnd(END_TIME);
         dto.setStatus(BookingStatus.APPROVED);
 
         // Act

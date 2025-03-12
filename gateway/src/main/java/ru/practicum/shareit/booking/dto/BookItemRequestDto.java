@@ -21,10 +21,12 @@ public class BookItemRequestDto {
 
     @Positive
     long itemId;
+
     @NotNull(message = "Start time cannot be null")
     @FutureOrPresent(message = "Start time must be in the present or future")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime start;
+
     @NotNull(message = "End time cannot be null")
     @Future(message = "End time must be in the future")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

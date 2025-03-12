@@ -44,8 +44,8 @@ class BookingControllerTest {
     void setUp() {
         bookingDto = BookingDto.builder()
                                .id(BOOKING_ID)
-                               .startTime(LocalDateTime.of(2025, 3, 12, 10, 0))
-                               .endTime(LocalDateTime.of(2025, 3, 13, 10, 0))
+                               .start(LocalDateTime.of(2025, 3, 12, 10, 0))
+                               .end(LocalDateTime.of(2025, 3, 13, 10, 0))
                                .itemId(1L)
                                .status(BookingStatus.WAITING)
                                .booker(new UserDto(BOOKER_ID, "John", "john@example.com"))
@@ -74,8 +74,8 @@ class BookingControllerTest {
                .andExpect(status().isOk())
                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                .andExpect(jsonPath("$[0].id").value(BOOKING_ID))
-               .andExpect(jsonPath("$[0].startTime").value("2025-03-12T10:00:00"))
-               .andExpect(jsonPath("$[0].endTime").value("2025-03-13T10:00:00"))
+               .andExpect(jsonPath("$[0].start").value("2025-03-12T10:00:00"))
+               .andExpect(jsonPath("$[0].end").value("2025-03-13T10:00:00"))
                .andExpect(jsonPath("$[0].status").value("WAITING"))
                .andExpect(jsonPath("$[0].booker.id").value(BOOKER_ID))
                .andExpect(jsonPath("$[0].item.id").value(1L));
@@ -97,8 +97,8 @@ class BookingControllerTest {
     @Test
     void shouldCreateBooking() throws Exception {
         BookingDto inputDto = BookingDto.builder()
-                                        .startTime(LocalDateTime.of(2025, 3, 12, 10, 0))
-                                        .endTime(LocalDateTime.of(2025, 3, 13, 10, 0))
+                                        .start(LocalDateTime.of(2025, 3, 12, 10, 0))
+                                        .end(LocalDateTime.of(2025, 3, 13, 10, 0))
                                         .itemId(1L)
                                         .build();
 

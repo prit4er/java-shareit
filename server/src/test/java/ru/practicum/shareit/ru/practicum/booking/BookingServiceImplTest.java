@@ -89,8 +89,8 @@ class BookingServiceImplTest {
         bookingDto = new BookingDto();
         bookingDto.setId(1L);
         bookingDto.setItemId(1L);
-        bookingDto.setStartTime(fixedTime.plusHours(1));
-        bookingDto.setEndTime(fixedTime.plusHours(2));
+        bookingDto.setStart(fixedTime.plusHours(1));
+        bookingDto.setEnd(fixedTime.plusHours(2));
         bookingDto.setStatus(BookingStatus.WAITING);
     }
 
@@ -132,22 +132,22 @@ class BookingServiceImplTest {
 
     @Test
     void createBookingDatesNullError() {
-        bookingDto.setStartTime(null);
+        bookingDto.setStart(null);
         assertThrows(ValidationException.class, () -> bookingService.createBooking(bookingDto, 1L));
     }
 
     @Test
     void createBookingBookerNotFoundError() {
-        bookingDto.setStartTime(fixedTime.plusHours(1));
-        bookingDto.setEndTime(fixedTime.plusHours(2));
+        bookingDto.setStart(fixedTime.plusHours(1));
+        bookingDto.setEnd(fixedTime.plusHours(2));
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> bookingService.createBooking(bookingDto, 1L));
     }
 
     @Test
     void createBookingItemNotAvailableError() {
-        bookingDto.setStartTime(fixedTime.plusHours(1));
-        bookingDto.setEndTime(fixedTime.plusHours(2));
+        bookingDto.setStart(fixedTime.plusHours(1));
+        bookingDto.setEnd(fixedTime.plusHours(2));
         item.setAvailable(false);
         when(userRepository.findById(1L)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
@@ -156,8 +156,8 @@ class BookingServiceImplTest {
 
     @Test
     void createBookingOwnerError() {
-        bookingDto.setStartTime(fixedTime.plusHours(1));
-        bookingDto.setEndTime(fixedTime.plusHours(2));
+        bookingDto.setStart(fixedTime.plusHours(1));
+        bookingDto.setEnd(fixedTime.plusHours(2));
         when(userRepository.findById(2L)).thenReturn(Optional.of(owner));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         assertThrows(NotFoundException.class, () -> bookingService.createBooking(bookingDto, 2L));
@@ -165,8 +165,8 @@ class BookingServiceImplTest {
 
     @Test
     void createBookingDatesInvalidError() {
-        bookingDto.setStartTime(fixedTime.plusHours(2));
-        bookingDto.setEndTime(fixedTime.plusHours(1));
+        bookingDto.setStart(fixedTime.plusHours(2));
+        bookingDto.setEnd(fixedTime.plusHours(1));
         when(userRepository.findById(1L)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         assertThrows(ValidationException.class, () -> bookingService.createBooking(bookingDto, 1L));

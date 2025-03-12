@@ -20,9 +20,9 @@ public class BookingDto {
 
     Long id;
 
-    LocalDateTime startTime;
+    LocalDateTime start;
 
-    LocalDateTime endTime;
+    LocalDateTime end;
 
     Long itemId;
 
