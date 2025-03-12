@@ -74,8 +74,8 @@ class BookingControllerTest {
                .andExpect(status().isOk())
                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                .andExpect(jsonPath("$[0].id").value(BOOKING_ID))
-               .andExpect(jsonPath("$[0].start").value("2025-03-12T10:00:00"))
-               .andExpect(jsonPath("$[0].end").value("2025-03-13T10:00:00"))
+               .andExpect(jsonPath("$[0].startTime").value("2025-03-12T10:00:00"))
+               .andExpect(jsonPath("$[0].endTime").value("2025-03-13T10:00:00"))
                .andExpect(jsonPath("$[0].status").value("WAITING"))
                .andExpect(jsonPath("$[0].booker.id").value(BOOKER_ID))
                .andExpect(jsonPath("$[0].item.id").value(1L));
