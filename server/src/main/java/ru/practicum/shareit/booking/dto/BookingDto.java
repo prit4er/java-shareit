@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,19 +21,15 @@ public class BookingDto {
 
     Long id;
 
-    @NotNull(message = "Start time cannot be null")
-    @JsonProperty("start")
     LocalDateTime startTime;
 
-    @NotNull(message = "End time cannot be null")
-    @JsonProperty("end")
     LocalDateTime endTime;
 
-    @NotNull(message = "Item ID cannot be null")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     Long itemId;
 
     BookingStatus status;
+
     UserDto booker;
+
     ItemDto item;
 }
