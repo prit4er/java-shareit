@@ -23,14 +23,14 @@ import java.util.Collection;
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
-    public static final String HEADER_USER_ID = "X-Sharer-User-Id";
+    public static final String HEADER_USER = "X-Sharer-User-Id";
 
     private final BookingServiceImpl bookingService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Collection<BookingDto> getBookingsByBookerId(
-            @RequestHeader(HEADER_USER_ID) Long bookerId,
+            @RequestHeader(HEADER_USER) Long bookerId,
             @RequestParam(defaultValue = "ALL") String state) {
         log.info("Received GET request for bookings for booker with id: {} and state: {}", bookerId, state);
         BookingStatus bookingState = BookingStatus.valueOf(state.toUpperCase());
@@ -39,14 +39,14 @@ public class BookingController {
 
     @GetMapping("/owner")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<BookingDto> getBookingsByOwnerId(@RequestHeader(HEADER_USER_ID) Long ownerId) {
+    public Collection<BookingDto> getBookingsByOwnerId(@RequestHeader(HEADER_USER) Long ownerId) {
         log.info("Received GET request for bookings for owner with id: {}", ownerId);
         return bookingService.getBookingsByOwnerId(ownerId);
     }
 
     @GetMapping("/{booking-id}")
     @ResponseStatus(HttpStatus.OK)
-    public BookingDto getBookingById(@RequestHeader(HEADER_USER_ID) Long userId,
+    public BookingDto getBookingById(@RequestHeader(HEADER_USER) Long userId,
                                      @PathVariable("booking-id") Long bookingId) {
         log.info("Received GET request for booking with id: {} for user with id: {}", bookingId, userId);
         return bookingService.getBookingById(bookingId, userId);
@@ -54,7 +54,7 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto createBooking(@RequestHeader(HEADER_USER_ID) Long bookerId,
+    public BookingDto createBooking(@RequestHeader(HEADER_USER) Long bookerId,
                                     @RequestBody BookingDto bookingDto) {
         log.info("Received POST request for booking for user with id: {}", bookerId);
         return bookingService.createBooking(bookingDto, bookerId);
@@ -62,7 +62,7 @@ public class BookingController {
 
     @PatchMapping("/{booking-id}")
     @ResponseStatus(HttpStatus.OK)
-    public BookingDto approveBooking(@RequestHeader(HEADER_USER_ID) Long ownerId,
+    public BookingDto approveBooking(@RequestHeader(HEADER_USER) Long ownerId,
                                      @PathVariable("booking-id") Long bookingId,
                                      @RequestParam boolean approved) {
         log.info("Received PATCH request for booking with id: {} by user with id: {}", bookingId, ownerId);
