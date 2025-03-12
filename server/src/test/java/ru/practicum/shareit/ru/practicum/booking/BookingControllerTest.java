@@ -64,6 +64,24 @@ class BookingControllerTest {
     }
 
     @Test
+    void shouldReturnBookingsWhenBookerIdIsValid() throws Exception {
+        when(bookingService.getBookingsByBookerIdAndState(BOOKER_ID, BookingStatus.ALL))
+                .thenReturn(Collections.singletonList(bookingDto));
+
+        mockMvc.perform(get("/bookings")
+                                .header(HEADER_USER_ID, BOOKER_ID)
+                                .param("state", "ALL"))
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$[0].id").value(BOOKING_ID))
+               .andExpect(jsonPath("$[0].start").value("2025-03-12T10:00:00"))
+               .andExpect(jsonPath("$[0].end").value("2025-03-13T10:00:00"))
+               .andExpect(jsonPath("$[0].status").value("WAITING"))
+               .andExpect(jsonPath("$[0].booker.id").value(BOOKER_ID))
+               .andExpect(jsonPath("$[0].item.id").value(1L));
+    }
+
+    @Test
     void shouldReturnBookingsForCurrentState() throws Exception {
         when(bookingService.getBookingsByBookerIdAndState(BOOKER_ID, BookingStatus.CURRENT))
                 .thenReturn(Collections.singletonList(bookingDto));

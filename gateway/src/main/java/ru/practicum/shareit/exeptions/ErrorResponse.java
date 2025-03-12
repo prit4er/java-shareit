@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Map;
+
 @Builder
 @Getter
 @Setter
@@ -18,5 +20,5 @@ import lombok.ToString;
 public class ErrorResponse {
 
     private String error;
-    private String message;
+    private Map<String, String> messages;  // Изменяем на Map для хранения множества сообщений
 }
