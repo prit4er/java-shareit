@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -19,14 +22,21 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookItemRequestDto {
 
-    @Positive
-    long itemId;
+    Long id;
+
     @NotNull(message = "Start time cannot be null")
-    @FutureOrPresent(message = "Start time must be in the present or future")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime start;
+    @JsonProperty("start")
+    LocalDateTime startTime;
+
     @NotNull(message = "End time cannot be null")
-    @Future(message = "End time must be in the future")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime end;
+    @JsonProperty("end")
+    LocalDateTime endTime;
+
+    @NotNull(message = "Item ID cannot be null")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    Long itemId;
+
+    BookingStatus status;
+    UserDto booker;
+    ItemDto item;
 }
