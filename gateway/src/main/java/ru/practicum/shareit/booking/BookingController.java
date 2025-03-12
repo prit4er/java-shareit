@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingStatus;
 
 @Controller
@@ -50,10 +50,10 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createBooking(@RequestHeader(USER_HEADER) @Positive long bookerId,
-                                                @Valid @RequestBody BookingDto bookingDto) {
-        log.info("Sending POST request for booking {}, userId={}", bookingDto, bookerId);
-        return bookingClient.create(bookerId, bookingDto);
+    public ResponseEntity<Object> createBooking(@RequestHeader(USER_HEADER) @Positive long userId,
+                                                @Valid @RequestBody BookItemRequestDto bookItemRequestDto) {
+        log.info("Sending POST request for booking {}, userId={}", bookItemRequestDto, userId);
+        return bookingClient.create(userId, bookItemRequestDto);
     }
 
     @PatchMapping("/{booking-id}")
